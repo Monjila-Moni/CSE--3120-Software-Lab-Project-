@@ -8,15 +8,16 @@ import com.example.cardiacMonitor.model.Task;
 
 import java.util.List;
 
+
 @Dao
 public interface OnDataBaseAction {
 
-    @Query("SELECT * FROM Task")
-    List<Task> getAllTasksList();
+  @Query("SELECT * FROM Task")
+  List<Task> getAllTasksList();
 
-    @Query("DELETE FROM Task")
+  /*  @Query("DELETE FROM Task")
     void truncateTheList();
-
+*/
     @Insert
     void insertDataIntoTaskList(Task task);
 

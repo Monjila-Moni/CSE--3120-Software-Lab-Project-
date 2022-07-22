@@ -1,7 +1,6 @@
 package com.example.cardiacMonitor.bottomSheetFragment;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -23,6 +22,7 @@ import com.example.cardiacMonitor.model.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.time.temporal.ValueRange;
 import java.util.Calendar;
 
 import butterknife.BindView;
@@ -52,7 +52,6 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
     int mYear, mMonth, mDay;
     int mHour, mMinute;
     setRefreshListener setRefreshListener;
-    AlarmManager alarmManager;
     TimePickerDialog timePickerDialog;
     DatePickerDialog datePickerDialog;
     MainActivity activity;
@@ -106,7 +105,7 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
                             date.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
                             datePickerDialog.dismiss();
                         }, mYear, mMonth, mDay);
-                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
                 datePickerDialog.show();
             }
             return true;
@@ -131,29 +130,55 @@ public class CreateTaskBottomSheetFragment extends BottomSheetDialogFragment {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public boolean validateFields() {
+        String systol =  systolic_pressure.getText().toString();
+        long sys = Integer.parseInt(systol);
+        String diastol =  diastolic_pressure.getText().toString();
+        long dia = Integer.parseInt(diastol);
+        String heart =  heart_rate.getText().toString();
+        long hr = Integer.parseInt(heart);
+        ValueRange srange = java.time.temporal.ValueRange.of(89,141);
+        ValueRange drange = java.time.temporal.ValueRange.of(59,91);
+        ValueRange hrange = java.time.temporal.ValueRange.of(60,150);
+
         if(date.getText().toString().equalsIgnoreCase("")) {
             Toast.makeText(activity, "Please enter a date", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if(time.getText().toString().equalsIgnoreCase("")) {
+        if(time.getText().toString().equalsIgnoreCase("")) {
             Toast.makeText(activity, "Please enter a time", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if(systolic_pressure.getText().toString().equalsIgnoreCase("")) {
+        if(systolic_pressure.getText().toString().equalsIgnoreCase("")) {
             Toast.makeText(activity, "Please enter systolic pressure", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if(diastolic_pressure.getText().toString().equalsIgnoreCase("")) {
+        if(diastolic_pressure.getText().toString().equalsIgnoreCase("")) {
             Toast.makeText(activity, "Please enter diastolic pressure", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if(heart_rate.getText().toString().equalsIgnoreCase("")) {
+        if(heart_rate.getText().toString().equalsIgnoreCase("")) {
             Toast.makeText(activity, "Please enter heart rate", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if(comment.getText().toString().equalsIgnoreCase("")) {
+       /* else if(comment.getText().toString().equalsIgnoreCase("")) {
             Toast.makeText(activity, "Please enter comment", Toast.LENGTH_SHORT).show();
+            return false;
+        }*/
+        if(!srange.isValidIntValue(sys))
+        {
+            Toast.makeText(activity, "Please enter valid systolic pressure", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if(!drange.isValidIntValue(dia))
+        {
+            Toast.makeText(activity, "Please enter valid diastolic pressure", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if(!hrange.isValidIntValue(hr))
+        {
+            Toast.makeText(activity, "Please enter valid heart rate", Toast.LENGTH_SHORT).show();
             return false;
         }
         else {
